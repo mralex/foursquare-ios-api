@@ -28,15 +28,8 @@
 
 @protocol BZFoursquareSessionDelegate;
 
-@interface BZFoursquare : NSObject  {
-    NSString    *clientID_;
-	NSString    *clientSecret_;
-    NSString    *callbackURL_;
-    NSString    *version_;
-    NSString    *locale_;
-    id<BZFoursquareSessionDelegate> sessionDelegate_;
-    NSString    *accessToken_;
-}
+@interface BZFoursquare : NSObject
+
 @property(nonatomic,copy,readonly) NSString *clientID;
 @property(nonatomic,copy,readonly) NSString *clientSecret;
 @property(nonatomic,copy,readonly) NSString *callbackURL;

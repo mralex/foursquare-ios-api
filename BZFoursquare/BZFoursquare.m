@@ -30,10 +30,6 @@
 #define __has_feature(x) 0
 #endif
 
-#if __has_feature(objc_arc)
-#error This file does not support Objective-C Automatic Reference Counting (ARC)
-#endif
-
 #define kAuthorizeBaseURL       @"https://foursquare.com/oauth2/authorize"
 
 @interface BZFoursquare ()
@@ -68,31 +64,20 @@
 	
 }
 
-- (void)dealloc {
-    self.clientID = nil;
-	self.clientSecret = nil;
-    self.callbackURL = nil;
-    self.version = nil;
-    self.locale = nil;
-    self.sessionDelegate = nil;
-    self.accessToken = nil;
-    [super dealloc];
-}
-
 - (BOOL)startAuthorization {
     NSMutableArray *pairs = [NSMutableArray array];
     NSDictionary *parameters = [NSDictionary dictionaryWithObjectsAndKeys:clientID_, @"client_id", @"token", @"response_type", callbackURL_, @"redirect_uri", nil];
     for (NSString *key in parameters) {
         NSString *value = [parameters objectForKey:key];
-        CFStringRef escapedValue = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)value, NULL, CFSTR("%:/?#[]@!$&'()*+,;="), kCFStringEncodingUTF8);
-        NSMutableString *pair = [[key mutableCopy] autorelease];
+        CFStringRef escapedValue = CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)value, NULL, CFSTR("%:/?#[]@!$&'()*+,;="), kCFStringEncodingUTF8);
+        NSMutableString *pair = [key mutableCopy];
         [pair appendString:@"="];
-        [pair appendString:(NSString *)escapedValue];
+        [pair appendString:(__bridge NSString *)escapedValue];
         [pairs addObject:pair];
         CFRelease(escapedValue);
     }
     NSString *URLString = kAuthorizeBaseURL;
-    NSMutableString *mURLString = [[URLString mutableCopy] autorelease];
+    NSMutableString *mURLString = [URLString mutableCopy];
     [mURLString appendString:@"?"];
     [mURLString appendString:[pairs componentsJoinedByString:@"&"]];
     NSURL *URL = [NSURL URLWithString:mURLString];
@@ -151,7 +136,7 @@
     if (locale_) {
         [mDict setObject:locale_ forKey:@"locale"];
     }
-    return [[[BZFoursquareRequest alloc] initWithPath:path HTTPMethod:HTTPMethod parameters:mDict delegate:delegate] autorelease];
+    return [[BZFoursquareRequest alloc] initWithPath:path HTTPMethod:HTTPMethod parameters:mDict delegate:delegate];
 }
 
 @end

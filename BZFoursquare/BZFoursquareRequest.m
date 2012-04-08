@@ -35,23 +35,19 @@
 #define __has_feature(x) 0
 #endif
 
-#if __has_feature(objc_arc)
-#error This file does not support Objective-C Automatic Reference Counting (ARC)
-#endif
-
 #define kAPIv2BaseURL           @"https://api.foursquare.com/v2"
 #define kTimeoutInterval        180.0
 
 static NSString * _BZGetMIMETypeFromFilename(NSString *filename) {
     NSString *pathExtension = [filename pathExtension];
-    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (CFStringRef)pathExtension, NULL);
-    CFStringRef MIMEType = UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType);
+    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)pathExtension, NULL);
+    NSString *MIMEType = (__bridge NSString *)UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType);
     CFRelease(UTI);
-    return [NSMakeCollectable(MIMEType) autorelease];
+    return MIMEType;
 }
 
 static NSString * _BZGetMIMEBoundary() {
-    NSDateFormatter *formatter = [[[NSDateFormatter alloc] init] autorelease];
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyyMMddHHmmss"];
     NSDate *date = [NSDate date];
     NSTimeInterval ti = [date timeIntervalSinceReferenceDate];
@@ -103,19 +99,6 @@ static NSString * _BZGetMIMEBoundary() {
     return self;
 }
 
-- (void)dealloc {
-    self.path = nil;
-    self.HTTPMethod = nil;
-    self.parameters = nil;
-    self.delegate = nil;
-    self.connection = nil;
-    self.responseData = nil;
-    self.meta = nil;
-    self.notifications = nil;
-    self.response = nil;
-    [super dealloc];
-}
-
 - (void)start {
     [self cancel];
     self.meta = nil;
@@ -130,7 +113,7 @@ static NSString * _BZGetMIMEBoundary() {
         NSAssert2(NO, @"*** %s: HTTP %@ method not supported", __PRETTY_FUNCTION__, HTTPMethod_);
         request = nil;
     }
-    self.connection = [[[NSURLConnection alloc] initWithRequest:request delegate:self] autorelease];
+    self.connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     NSAssert1(connection_ != nil, @"*** %s: connection is nil", __PRETTY_FUNCTION__);
 }
 
@@ -157,7 +140,7 @@ static NSString * _BZGetMIMEBoundary() {
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    NSString *responseString = [[[NSString alloc] initWithData:responseData_ encoding:NSUTF8StringEncoding] autorelease];
+    NSString *responseString = [[NSString alloc] initWithData:responseData_ encoding:NSUTF8StringEncoding];
     NSDictionary *response;
     NSError *error = nil;
 #if defined(__IPHONE_5_0) && __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_5_0
@@ -233,15 +216,15 @@ bye:
                 continue;
             }
         }
-        CFStringRef escapedValue = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)value, NULL, CFSTR("%:/?#[]@!$&'()*+,;="), kCFStringEncodingUTF8);
-        NSMutableString *pair = [[key mutableCopy] autorelease];
+        CFStringRef escapedValue = CFURLCreateStringByAddingPercentEscapes(NULL, (__bridge CFStringRef)value, NULL, CFSTR("%:/?#[]@!$&'()*+,;="), kCFStringEncodingUTF8);
+        NSMutableString *pair = [key mutableCopy];
         [pair appendString:@"="];
-        [pair appendString:(NSString *)escapedValue];
+        [pair appendString:(__bridge NSString *)escapedValue];
         [pairs addObject:pair];
         CFRelease(escapedValue);
     }
     NSString *URLString = [kAPIv2BaseURL stringByAppendingPathComponent:path_];
-    NSMutableString *mURLString = [[URLString mutableCopy] autorelease];
+    NSMutableString *mURLString = [URLString mutableCopy];
     [mURLString appendString:@"?"];
     [mURLString appendString:[pairs componentsJoinedByString:@"&"]];
     NSURL *URL = [NSURL URLWithString:mURLString];
