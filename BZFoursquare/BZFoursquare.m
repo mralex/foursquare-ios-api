@@ -38,12 +38,14 @@
 
 @interface BZFoursquare ()
 @property(nonatomic,copy,readwrite) NSString *clientID;
+@property(nonatomic,copy,readwrite) NSString *clientSecret;
 @property(nonatomic,copy,readwrite) NSString *callbackURL;
 @end
 
 @implementation BZFoursquare
 
 @synthesize clientID = clientID_;
+@synthesize clientSecret = clientSecret_;
 @synthesize callbackURL = callbackURL_;
 @synthesize version = version_;
 @synthesize locale = locale_;
@@ -51,17 +53,24 @@
 @synthesize accessToken = accessToken_;
 
 - (id)initWithClientID:(NSString *)clientID callbackURL:(NSString *)callbackURL {
+	return [self initWithClientID:clientID clientSecret:nil callbackURL:callbackURL];
+}
+
+- (id)initWithClientID:(NSString *)clientID clientSecret:(NSString *)clientSecret callbackURL:(NSString *)callbackURL {
     NSParameterAssert(clientID != nil && callbackURL != nil);
     self = [super init];
     if (self) {
         self.clientID = clientID;
+		self.clientSecret = clientSecret;
         self.callbackURL = callbackURL;
     }
     return self;
+	
 }
 
 - (void)dealloc {
     self.clientID = nil;
+	self.clientSecret = nil;
     self.callbackURL = nil;
     self.version = nil;
     self.locale = nil;
@@ -132,7 +141,10 @@
     NSMutableDictionary *mDict = [NSMutableDictionary dictionaryWithDictionary:parameters];
     if ([self isSessionValid]) {
         [mDict setObject:accessToken_ forKey:@"oauth_token"];
-    }
+    } else if (self.clientSecret) {
+		[mDict setObject:self.clientID forKey:@"client_id"];
+		[mDict setObject:self.clientSecret forKey:@"client_secret"];
+	}
     if (version_) {
         [mDict setObject:version_ forKey:@"v"];
     }

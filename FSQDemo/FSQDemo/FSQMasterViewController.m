@@ -27,6 +27,7 @@
 #import "FSQMasterViewController.h"
 
 #define kClientID       FOURSQUARE_CLIENT_ID
+#define kClientSecret   FOURSQUARE_CLIENT_SECRET
 #define kCallbackURL    FOURSQUARE_CALLBACK_URL
 
 @interface FSQMasterViewController ()
@@ -80,7 +81,7 @@ enum {
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        self.foursquare = [[BZFoursquare alloc] initWithClientID:kClientID callbackURL:kCallbackURL];
+        self.foursquare = [[BZFoursquare alloc] initWithClientID:kClientID clientSecret:kClientSecret callbackURL:kCallbackURL];
         foursquare_.version = @"20111119";
         foursquare_.locale = [[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode];
         foursquare_.sessionDelegate = self;

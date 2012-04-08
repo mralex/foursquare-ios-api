@@ -30,6 +30,7 @@
 
 @interface BZFoursquare : NSObject  {
     NSString    *clientID_;
+	NSString    *clientSecret_;
     NSString    *callbackURL_;
     NSString    *version_;
     NSString    *locale_;
@@ -37,6 +38,7 @@
     NSString    *accessToken_;
 }
 @property(nonatomic,copy,readonly) NSString *clientID;
+@property(nonatomic,copy,readonly) NSString *clientSecret;
 @property(nonatomic,copy,readonly) NSString *callbackURL;
 @property(nonatomic,copy) NSString *version; // YYYYMMDD
 @property(nonatomic,copy) NSString *locale;  // en (default), fr, de, it, etc.
@@ -44,6 +46,7 @@
 @property(nonatomic,copy) NSString *accessToken;
 
 - (id)initWithClientID:(NSString *)clientID callbackURL:(NSString *)callbackURL;
+- (id)initWithClientID:(NSString *)clientID clientSecret:(NSString *)clientSecret callbackURL:(NSString *)callbackURL;
 
 - (BOOL)startAuthorization;
 - (BOOL)handleOpenURL:(NSURL *)url;
